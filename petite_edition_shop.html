@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HiHi 嗨孩</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --cr:#F7F3EF;--cr2:#EFE8E0;--cr3:#E5D9CC;
+  --pk:#E8C4BB;--pk2:#C9947F;--pk3:#9B6350;
+  --br:#6B4C3B;--br2:#3E2A1E;
+  --tx:#3E2A1E;--tx2:#7A5C4A;--tx3:#A88B7A;
+  --bd:rgba(107,76,59,0.15);--bd2:rgba(107,76,59,0.28);
+  --gn:#4A7A50;--gnbg:#EBF4EB;
+}
+body{background:var(--cr);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:400px;margin:0 auto;}
+.topbar{background:var(--cr);border-bottom:1px solid var(--bd2);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;}
+.logo{font-size:14px;font-weight:600;letter-spacing:0.1em;color:var(--br2);}
+.logo-s{font-size:9px;letter-spacing:0.22em;color:var(--tx3);}
+.cart-btn{display:flex;align-items:center;gap:5px;border:1px solid var(--bd2);border-radius:20px;padding:6px 14px;font-size:11px;background:transparent;color:var(--tx2);cursor:pointer;}
+.bdg{background:var(--pk2);color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:600;}
+.promo-bar{background:#FDF0E8;border-bottom:1px solid var(--pk);padding:8px 16px;display:flex;gap:16px;}
+.pt{font-size:10px;color:var(--pk3);font-weight:500;}
+.body-wrap{display:flex;min-height:calc(100vh - 88px);}
+.sb{width:70px;min-width:70px;background:var(--cr2);border-right:1px solid var(--bd);}
+.aci{display:flex;flex-direction:column;align-items:center;padding:12px 4px;cursor:pointer;border-right:3px solid transparent;gap:4px;border-bottom:1px solid var(--bd);}
+.aci.on{border-right-color:var(--pk2);background:var(--cr);}
+.aci span{font-size:9px;color:var(--tx3);}
+.aci.on span{color:var(--pk3);font-weight:600;}
+.gh{display:flex;flex-direction:column;align-items:center;padding:8px 4px 6px;cursor:pointer;border-bottom:1px solid var(--bd);gap:2px;}
+.gt{font-size:8px;letter-spacing:0.16em;color:var(--tx3);}
+.ga{font-size:10px;color:var(--tx3);transition:transform 0.2s;}
+.ga.open{transform:rotate(180deg);}
+.gi{overflow:hidden;transition:max-height 0.25s ease;}
+.ci{display:flex;flex-direction:column;align-items:center;padding:10px 4px;cursor:pointer;border-right:3px solid transparent;gap:3px;}
+.ci.on{border-right-color:var(--pk2);background:var(--cr);}
+.ci-i{font-size:13px;color:var(--tx2);}
+.ci-l{font-size:9px;color:var(--tx3);text-align:center;line-height:1.3;}
+.ci.on .ci-l{color:var(--pk3);font-weight:600;}
+.right-area{flex:1;padding:12px 10px;overflow-y:auto;}
+.albl{font-size:9px;letter-spacing:0.2em;color:var(--tx3);margin-bottom:10px;display:block;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.card{background:#fff;border:1px solid var(--bd);border-radius:12px;overflow:hidden;cursor:pointer;}
+.cimg{width:100%;aspect-ratio:3/4;background:var(--cr2);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.cimg img{width:100%;height:100%;object-fit:cover;}
+.ntag{position:absolute;top:8px;left:8px;background:#FDF0E8;border:1px solid var(--pk);border-radius:10px;padding:2px 8px;font-size:9px;color:var(--pk3);font-weight:600;z-index:1;}
+.cb{padding:10px 10px 12px;}
+.cbr{font-size:9px;color:var(--tx3);margin-bottom:2px;}
+.cnm{font-size:12px;font-weight:600;color:var(--br2);margin-bottom:5px;line-height:1.35;}
+.cpr{display:flex;align-items:baseline;gap:5px;}
+.cpr-n{font-size:13px;font-weight:600;color:var(--pk3);}
+.cpr-o{font-size:10px;color:var(--tx3);text-decoration:line-through;}
+.pagination{display:flex;align-items:center;justify-content:center;gap:10px;padding:16px 0;margin-top:8px;}
+.pg-btn{border:1px solid var(--bd2);border-radius:8px;padding:7px 14px;font-size:12px;background:transparent;color:var(--tx2);cursor:pointer;}
+.pg-btn:disabled{opacity:0.3;cursor:not-allowed;}
+.pg-info{font-size:11px;color:var(--tx3);}
+.page{display:none;}.page.active{display:block;}
+.dim{width:100%;aspect-ratio:3/4;background:var(--cr2);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.dim img{width:100%;height:100%;object-fit:cover;}
+.dnb{position:absolute;top:12px;left:12px;background:#FDF0E8;border:1px solid var(--pk);border-radius:10px;padding:3px 10px;font-size:10px;color:var(--pk3);font-weight:600;z-index:1;}
+.img-dots{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:2;}
+.img-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.5);cursor:pointer;border:none;}
+.img-dot.on{background:#fff;}
+.img-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.85);border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;z-index:2;display:flex;align-items:center;justify-content:center;}
+.img-nav.prev{left:8px;}.img-nav.next{right:8px;}
+.dbody{padding:16px;}
+.dbr{font-size:9px;letter-spacing:0.18em;color:var(--tx3);margin-bottom:4px;}
+.dnm{font-size:17px;font-weight:600;color:var(--br2);margin-bottom:4px;line-height:1.4;}
+.dag{font-size:11px;color:var(--tx3);margin-bottom:8px;}
+.dpr{display:flex;align-items:baseline;gap:8px;margin-bottom:16px;}
+.dpr-n{font-size:22px;font-weight:600;color:var(--pk3);}
+.dpr-o{font-size:14px;color:var(--tx3);text-decoration:line-through;}
+.dpr-tag{font-size:10px;color:var(--pk3);background:#FDF0E8;border-radius:6px;padding:2px 8px;font-weight:600;}
+.szlbl{font-size:9px;letter-spacing:0.15em;color:var(--tx3);margin-bottom:6px;display:block;}
+.szs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;}
+.sz{border:1px solid var(--bd2);border-radius:6px;padding:8px 12px;font-size:12px;cursor:pointer;color:var(--tx2);background:transparent;}
+.sz.on{background:var(--pk);border-color:var(--pk2);color:var(--pk3);font-weight:600;}
+.sz-desc{font-size:10px;color:var(--tx3);margin-bottom:16px;padding:6px 10px;background:var(--cr2);border-radius:6px;line-height:1.7;}
+.clbl{font-size:9px;letter-spacing:0.15em;color:var(--tx3);margin-bottom:6px;display:block;}
+.cls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.cl{border:1px solid var(--bd2);border-radius:6px;padding:8px 12px;font-size:12px;cursor:pointer;color:var(--tx2);background:transparent;}
+.cl.on{background:var(--pk);border-color:var(--pk2);color:var(--pk3);font-weight:600;}
+.btnm{width:100%;border:none;border-radius:10px;padding:14px;font-size:13px;font-weight:600;background:var(--br);color:var(--cr);cursor:pointer;letter-spacing:0.1em;margin-bottom:10px;}
+.bto{width:100%;border:1px solid var(--bd2);border-radius:10px;padding:13px;font-size:12px;background:transparent;color:var(--tx2);cursor:pointer;margin-bottom:8px;}
+.wp{padding:16px;}
+.back{display:flex;align-items:center;gap:5px;border:1px solid var(--bd2);border-radius:20px;padding:7px 14px;font-size:11px;background:transparent;color:var(--tx2);cursor:pointer;width:fit-content;margin-bottom:16px;}
+.ptit{font-size:14px;font-weight:600;letter-spacing:0.14em;color:var(--br2);margin-bottom:16px;}
+.citem{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start;}
+.ci-img{width:54px;height:66px;background:var(--cr2);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
+.ci-img img{width:100%;height:100%;object-fit:cover;}
+.cbox{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:14px;}
+.crow{display:flex;justify-content:space-between;font-size:12px;color:var(--tx2);padding:4px 0;}
+.cdiv{height:1px;background:var(--bd);margin:10px 0;}
+.csub{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;}
+.ctot{display:flex;justify-content:space-between;font-size:16px;font-weight:600;color:var(--br2);padding-top:10px;border-top:1px solid var(--bd);margin-top:6px;}
+.ctot-a{color:var(--pk3);}
+.ship-ok{background:var(--gnbg);border:1px solid #9FC49F;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:11px;color:var(--gn);display:flex;align-items:center;gap:6px;font-weight:600;}
+.ship-no{background:var(--cr2);border:1px solid var(--bd2);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:11px;color:var(--tx3);display:flex;align-items:center;gap:8px;}
+.spbar{height:5px;background:var(--cr3);border-radius:4px;flex:1;overflow:hidden;}
+.spfill{height:5px;background:var(--pk2);border-radius:4px;}
+.osum{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:14px;}
+.ost{font-size:9px;letter-spacing:0.18em;color:var(--tx3);margin-bottom:10px;}
+.osr{display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:1px solid var(--bd);}
+.osr:last-child{border:none;padding-top:10px;font-size:14px;font-weight:600;color:var(--br2);}
+.osa{color:var(--pk3);}
+.fg{margin-bottom:12px;}
+.fl{font-size:9px;letter-spacing:0.15em;color:var(--tx3);margin-bottom:5px;display:block;}
+.fg input{width:100%;border:1px solid var(--bd2);border-radius:10px;padding:11px 14px;font-size:14px;background:#fff;color:var(--tx);font-family:inherit;}
+.fg input:focus{outline:none;border-color:var(--pk2);}
+.fg input::placeholder{color:var(--tx3);}
+.opt-lbl{font-size:9px;color:var(--tx3);margin-left:4px;}
+.swp{padding:3rem 1.5rem;text-align:center;}
+.sln{width:40px;height:1px;background:var(--pk);margin:0 auto 2rem;}
+.sic{font-size:48px;margin-bottom:1rem;}
+.sti{font-size:18px;font-weight:600;letter-spacing:0.15em;color:var(--br2);margin-bottom:10px;}
+.ssu{font-size:12px;color:var(--tx3);line-height:2;margin-bottom:1.5rem;}
+.sno{background:var(--cr2);border-radius:10px;padding:10px 20px;font-size:12px;color:var(--tx2);display:inline-block;margin-bottom:2rem;}
+.empty{grid-column:1/-1;text-align:center;padding:3rem 1rem;font-size:12px;color:var(--tx3);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <div class="logo">HiHi 嗨孩</div>
+    <div class="logo-s">質感正韓童裝選品</div>
+  </div>
+  <button class="cart-btn" onclick="gp('cart')">
+    🛒 購物車 <span class="bdg" id="cnt">0</span>
+  </button>
+</div>
+
+<div class="promo-bar">
+  <span class="pt">🏷 新品上市 95折</span>
+  <span class="pt">🚚 滿 NT$1,800 免運</span>
+</div>
+
+<div id="pg-shop" class="page active">
+  <div class="body-wrap">
+    <div class="sb">
+      <div class="aci on" id="aci" onclick="sc('all')">
+        <span style="font-size:16px;">◈</span><span>全部</span>
+      </div>
+      <div class="gh" onclick="tg('type')"><span class="gt">類型</span><span class="ga" id="a-type">▾</span></div>
+      <div class="gi" id="g-type" style="max-height:0;"></div>
+      <div class="gh" onclick="tg('brand')"><span class="gt">品牌</span><span class="ga" id="a-brand">▾</span></div>
+      <div class="gi" id="g-brand" style="max-height:0;"></div>
+    </div>
+    <div class="right-area">
+      <span class="albl" id="albl">ALL ITEMS</span>
+      <div class="grid" id="grid"></div>
+      <div class="pagination" id="pagination" style="display:none;">
+        <button class="pg-btn" id="pg-prev" onclick="changePage(-1)">← 上一頁</button>
+        <span class="pg-info" id="pg-info"></span>
+        <button class="pg-btn" id="pg-next" onclick="changePage(1)">下一頁 →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="pg-detail" class="page">
+  <div class="dim" id="dim"></div>
+  <div class="dbody">
+    <button class="back" onclick="gp('shop')">← 返回</button>
+    <div class="dbr" id="dbr"></div>
+    <div class="dnm" id="dnm"></div>
+    <div class="dag" id="dag"></div>
+    <div class="dpr" id="dpr"></div>
+    <span class="szlbl">選擇尺寸</span>
+    <div class="szs" id="dszs"></div>
+    <div class="sz-desc" id="sz-desc"></div>
+    <span class="clbl" id="clbl" style="display:none;">選擇顏色</span>
+    <div class="cls" id="dcls"></div>
+    <button class="btnm" onclick="addCart()">加入購物車</button>
+    <button class="bto" onclick="gp('shop')">繼續選購</button>
+  </div>
+</div>
+
+<div id="pg-cart" class="page">
+  <div class="wp">
+    <button class="back" onclick="gp('shop')">← 繼續選購</button>
+    <div class="ptit">購物車</div>
+    <div id="citems"></div>
+    <div id="cfoot" style="display:none;">
+      <div id="sind"></div>
+      <div class="cbox" id="csum"></div>
+      <button class="btnm" onclick="gp('confirm')">前往結帳 →</button>
+    </div>
+    <div id="cempty" style="text-align:center;padding:3rem 1rem;font-size:12px;color:var(--tx3);">購物車是空的</div>
+  </div>
+</div>
+
+<div id="pg-confirm" class="page">
+  <div class="wp">
+    <button class="back" onclick="gp('cart')">← 返回購物車</button>
+    <div class="ptit">確認訂單</div>
+    <div class="osum" id="cfsum"></div>
+    <button class="btnm" onclick="gp('form')">確定結帳 →</button>
+    <button class="bto" onclick="gp('cart')">修改購物車</button>
+  </div>
+</div>
+
+<div id="pg-form" class="page">
+  <div class="wp">
+    <button class="back" onclick="gp('confirm')">← 返回</button>
+    <div class="ptit">填寫資料</div>
+    <div style="background:linear-gradient(135deg,#FDF0E8,#F7E8DC);border:1.5px solid #C9947F;border-radius:14px;padding:20px;margin-bottom:16px;">
+      <p style="font-size:13px;font-weight:700;color:#9B6350;margin-bottom:16px;">💳 匯款帳號</p>
+      <p style="font-size:12px;color:#7A5C4A;margin-bottom:6px;">銀行：<strong style="font-size:14px;color:#3E2A1E;">台新銀行(812)</strong></p>
+      <p style="font-size:12px;color:#7A5C4A;margin-bottom:16px;">帳號：<strong style="font-size:14px;color:#3E2A1E;">XXXXX</strong></p>
+      <p style="font-size:11px;color:#9B6350;text-align:center;border-top:1px dashed #C9947F;padding-top:12px;">⚠️ 請於 3 日內完成匯款<br>匯款後請截圖傳給我們確認</p>
+    </div>
+    <div class="fg"><label class="fl">收件人姓名</label><input id="fn" placeholder="請輸入姓名"/></div>
+    <div class="fg"><label class="fl">IG 帳號 <span class="opt-lbl">（選填）</span></label><input id="fig" placeholder="@your_instagram"/></div>
+    <div class="fg"><label class="fl">手機號碼</label><input id="fp" type="tel" placeholder="09xx-xxx-xxx"/></div>
+    <div class="fg"><label class="fl">7-ELEVEN 取貨門市</label><input id="fs" placeholder="例：台北忠孝門市"/></div>
+    <div class="osum" id="fsum"></div>
+    <button class="btnm" id="submit-btn" onclick="submitOrder()">確認下單 →</button>
+  </div>
+</div>
+
+<div id="pg-ok" class="page">
+  <div class="swp">
+    <div class="sln"></div>
+    <div class="sic">✅</div>
+    <div class="sti">訂單已送出</div>
+    <div class="ssu">請於 3 日內完成匯款<br>匯款後請截圖傳給我們確認<br>確認後將盡快為您出貨</div>
+    <div class="sno" id="sno"></div>
+    <button class="btnm" style="max-width:200px;margin:0 auto;display:block;" onclick="gp('shop')">繼續選購</button>
+  </div>
+</div>
+
+<script>
+const API='https://script.google.com/macros/s/AKfycbw-pBa_V9LY7OP1O9iDS371QOqJsN_DsGuk4cI1RZEYpG7YNS_k0OyAY5XUXq_5JTKx/exec';
+const DISC=0.95,SFREE=1800,SFEE=60,PAGE_SIZE=8;
+let curPage=1,prods=[],cat='all',cur=null,sz=null,cl=null,cart=[],curImgs=[],curImgIdx=0;
+const typeIcons={'泳裝':'🩱','泳帽':'🧢','上衣':'👕','褲子':'👖'};
+
+const P=[
+  {id:0,name:'碎花泳裝兩件式',brand:'GIOIELLO',type:'泳裝',price:880,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/f_auto,q_auto/10_202605071433A_mytyh3'],sizes:['S','M','L','XL'],sizeDescs:['S(~3歲/~15kg/90cm)','M(~4歲/~19kg/~100cm)','L(~5歲/~23kg/~110cm)','XL(~6歲/~27kg/~120cm)'],colors:['粉','白'],isNew:true},
+  {id:1,name:'公主袖連身洋裝',brand:'Lacamel',type:'泳裝',price:880,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779202207/La19_b27gis.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779202207/La20_e92riw.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779202207/La21_xjn6y3.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779202207/La22_hpivv1.jpg'],sizes:['XS','S','M','L','XL'],sizeDescs:['XS(1~2歲/80~90cm)','S(2~3歲/90~99cm)','M(3~4歲/98~105cm)','L(4~6歲/105~115cm)','XL(6~7歲/115~122cm)'],colors:['圖片色'],isNew:true},
+  {id:2,name:'碎花荷葉袖兩件式泳裝',brand:'Lacamel',type:'泳裝',price:880,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779202207/La18_vsvtqh.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779202206/La16_l6jmve.jpg'],sizes:['XS','S','M','L','XL'],sizeDescs:['XS(1~2歲/80~90cm)','S(2~3歲/90~99cm)','M(3~4歲/98~105cm)','L(4~6歲/105~115cm)','XL(6~7歲/115~122cm)'],colors:['圖片色'],isNew:true},
+  {id:3,name:'長袖碎花泳裝',brand:'Lacamel',type:'泳裝',price:860,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779202206/La13_wmguub.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779202206/La14_gxcxn9.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779202206/La15_jnu4m3.jpg'],sizes:['XS','S','M','L','XL'],sizeDescs:['XS(1~2歲/80~90cm)','S(2~3歲/90~99cm)','M(3~4歲/98~105cm)','L(4~6歲/105~115cm)','XL(6~7歲/115~122cm)'],colors:['圖片色'],isNew:true},
+  {id:4,name:'櫻桃泳裝含外套',brand:'Lacamel',type:'泳裝',price:1020,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779202206/La11_hlom9z.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779202206/La12_cuim2i.jpg'],sizes:['XS','S','M','L','XL'],sizeDescs:['XS(1~2歲/80~90cm)','S(2~3歲/90~99cm)','M(3~4歲/98~105cm)','L(4~6歲/105~115cm)','XL(6~7歲/115~122cm)'],colors:['圖片色'],isNew:true},
+  {id:5,name:'芭蕾舞伶泳裝',brand:'Lacamel',type:'泳裝',price:880,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779202205/La6_y2wv9e.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779202205/La7_he0ofb.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779202205/La9_u6ngwk.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779202206/La10_rjadqx.jpg'],sizes:['XS','S','M','L','XL'],sizeDescs:['XS(1~2歲/80~90cm)','S(2~3歲/90~99cm)','M(3~4歲/98~105cm)','L(4~6歲/105~115cm)','XL(6~7歲/115~122cm)'],colors:['圖片色'],isNew:true},
+  {id:6,name:'碎花吊帶泳裝',brand:'Lacamel',type:'泳裝',price:880,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779202205/La4_uxe5qr.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779202205/La5_a3h9lg.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779202204/La1_iozach.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779202204/La2_n9ckqc.jpg'],sizes:['XS','S','M','L','XL'],sizeDescs:['XS(1~2歲/80~90cm)','S(2~3歲/90~99cm)','M(3~4歲/98~105cm)','L(4~6歲/105~115cm)','XL(6~7歲/115~122cm)'],colors:['藍','紅'],isNew:true},
+  {id:7,name:'砰砰肩膀花朵泳裝',brand:'Lacamel',type:'泳裝',price:880,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779202177/La30_r7nvix.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779202177/La28_ud2viz.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779202177/La27_emwwfk.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779202176/La29_dxiipi.jpg'],sizes:['XS','S','M','L','XL'],sizeDescs:['XS(1~2歲/80~90cm)','S(2~3歲/90~99cm)','M(3~4歲/98~105cm)','L(4~6歲/105~115cm)','XL(6~7歲/115~122cm)'],colors:['米白','黑'],isNew:true},
+  {id:8,name:'泳帽',brand:'Lacamel',type:'泳帽',price:240,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779202207/La25_txnl7t.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779202208/La26_x7x6ep.jpg'],sizes:['Free'],sizeDescs:[],colors:['圖片色'],isNew:false},
+  {id:9,name:'可愛櫻桃泳裝(一套含帽)',brand:'Marron',type:'泳裝',price:900,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779202209/Marron7_uhjygb.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779202209/Marron6_uq4fjk.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779202208/Marron4_ullpcx.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779202208/Marron5_g9ukjf.jpg'],sizes:['XS','S','M','L'],sizeDescs:['XS(~80cm)','S(80~90cm)','M(90~100cm)','L(100~110cm)'],colors:['紅','粉'],isNew:true},
+  {id:10,name:'砰砰愛心泳裝(一套含帽)',brand:'Mybebe',type:'泳裝',price:700,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779202211/mybebe4_xp6czh.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779202211/mybebe2_i0arz1.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779202211/mybebe3_jjkrdh.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779202211/mybebe1_kuviis.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779202197/mybebe6_vqearg.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779202197/mybebe5_jq7xoy.jpg'],sizes:['S','M','L'],sizeDescs:['S(1~2y)','M(3~4y)','L(5~6y)'],colors:['藍','紅'],isNew:true},
+  {id:11,name:'愛心泳裝(一套)',brand:'Jeaya',type:'泳裝',price:780,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779202203/Jeaya2_wzfdp0.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779202203/Jeaya1_zip3hi.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779202204/Jeaya3_a2xgha.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779202204/Jeaya4_m2rb9e.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779202204/Jeaya5_smynmr.jpg'],sizes:['S','M','L'],sizeDescs:['S(70~80cm)','M(80~90cm)','L(90~100cm)'],colors:['藍綠','紅','粉'],isNew:true},
+  {id:12,name:'水手包屁連身服',brand:'Milkbalm',type:'包屁連身服',price:760,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779291583/milkbalm-04-01_uobft8.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291583/milkbalm-04-02_ifjzw9.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291583/milkbalm-04-03_a0spvi.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291581/milkbalm-04-04_pqf7jg.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291581/milkbalm-04-05_uxbkdr.jpg'],sizes:['XS','S','M'],sizeDescs:['XS(0~6m/75~80cm/~8kg)','S(6~12m/80~95cm/~10kg)','M(12~18m/85~90cm/~12kg)'],colors:['藍','粉'],isNew:true},
+  {id:13,name:'格紋包屁連身服',brand:'Milkbalm',type:'包屁連身服',price:760,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779291584/milkbalm-06-01_ewvu0b.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291584/milkbalm-06-02_ttyjia.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291584/milkbalm-06-03_y33vzw.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291584/milkbalm-06-04_agh3ep.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291584/milkbalm-06-05_zxxy5k.jpg'],sizes:['XS','S','M'],sizeDescs:['XS(0~6m/75~80cm/~8kg)','S(6~12m/80~95cm/~10kg)','M(12~18m/85~90cm/~12kg)'],colors:['藍','紅'],isNew:true},
+  {id:14,name:'刺繡小花包屁連身服',brand:'Milkbalm',type:'包屁連身服',price:880,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779291585/milkbalm-08-01_d0qg6g.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291585/milkbalm-08-02_bwmsdu.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291585/milkbalm-08-03_qcwwh0.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291585/milkbalm-08-04_tx6d3s.jpg'],sizes:['XS','S','M'],sizeDescs:['XS(0~6m/75~80cm/~8kg)','S(6~12m/80~95cm/~10kg)','M(12~18m/85~90cm/~12kg)'],colors:['圖片色'],isNew:true},
+  {id:15,name:'超Q草莓刺繡包屁連身服',brand:'Milkbalm',type:'包屁連身服',price:760,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779291645/milkbalm-10-01_fiur6p.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291645/milkbalm-10-02_cvegus.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291645/milkbalm-10-03_moloo9.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291645/milkbalm-10-04_zften5.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291645/milkbalm-10-05_kwzqwq.jpg'],sizes:['XS','S','M'],sizeDescs:['XS(0~6m/75~80cm/~8kg)','S(6~12m/80~95cm/~10kg)','M(12~18m/85~90cm/~12kg)'],colors:['深藍','淺藍'],isNew:true},
+  {id:16,name:'刺繡小雛菊包屁連身服',brand:'Milkbalm',type:'包屁連身服',price:760,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779291673/milkbalm-14-01_thz3ol.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291673/milkbalm-14-02_cdulro.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291673/milkbalm-14-03_zw9vtp.jpg'],sizes:['XS','S','M'],sizeDescs:['XS(0~6m/75~80cm/~8kg)','S(6~12m/80~95cm/~10kg)','M(12~18m/85~90cm/~12kg)'],colors:['圖片色'],isNew:true},
+  {id:17,name:'精緻度假風包屁連身服',brand:'Milkbalm',type:'包屁連身服',price:660,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779291674/milkbalm-17-01_k3gvyf.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291700/milkbalm-17-02_mrgp9j.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291700/milkbalm-17-03_lo8qg9.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291700/milkbalm-18-05_ppzz1h.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291701/milkbalm-18-08_zrydrn.jpg'],sizes:['XS','S','M'],sizeDescs:['XS(0~6m/75~80cm/~8kg)','S(6~12m/80~95cm/~10kg)','M(12~18m/85~90cm/~12kg)'],colors:['淺藍','黑','白'],isNew:true},
+  {id:18,name:'精緻度假風包屁套裝',brand:'Milkbalm',type:'套裝',price:720,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779291700/milkbalm-18-01_f65h6f.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291700/milkbalm-18-02_ywdkzf.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291700/milkbalm-18-03_dszpzz.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291700/milkbalm-18-04_tepets.jpg'],sizes:['XS','S','M','L','XL'],sizeDescs:['XS(1~2/75~85cm/~10kg)','S(2~3/85~95cm/11~13kg)','M(3~4/95~105cm/14~17kg)','L(4~5/105~115cm/17~20kg)','XL(6~7/115~125cm/20~25kg)'],colors:['淺藍','黑','白'],isNew:true},
+  {id:19,name:'後綁帶度假感洋裝',brand:'Milkbalm',type:'洋裝',price:780,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779291701/milkbalm-01-05_jmvauz.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291581/milkbalm-01-06_xmeoac.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291701/milkbalm-01-04_lks36z.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291701/milkbalm-01-03_vix8gj.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291701/milkbalm-01-02_rtd9kh.jpg'],sizes:['XS','S','M','L','XL'],sizeDescs:['XS(1~2/75~85cm/~10kg)','S(2~3/85~95cm/11~13kg)','M(3~4/95~105cm/14~17kg)','L(4~5/105~115cm/17~20kg)','XL(6~7/115~125cm/20~25kg)'],colors:['直條紋','格紋'],isNew:true},
+  {id:20,name:'度假風舒適寬長褲',brand:'Milkbalm',type:'長褲',price:580,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779291582/milkbalm-03-01_wdzeft.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291583/milkbalm-03-02_kgxfmb.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291583/milkbalm-03-03_yekltc.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291583/milkbalm-03-04_ufh6k8.jpg'],sizes:['XS','S','M','L','XL'],sizeDescs:['XS(1~2/75~85cm/~10kg)','S(2~3/85~95cm/11~13kg)','M(3~4/95~105cm/14~17kg)','L(4~5/105~115cm/17~20kg)','XL(6~7/115~125cm/20~25kg)'],colors:['直條紋','格紋'],isNew:true},
+  {id:21,name:'後綁帶度假感上衣',brand:'Milkbalm',type:'上衣',price:660,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779291581/milkbalm-02-01_frbscf.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291581/milkbalm-02-02_lm94rg.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291582/milkbalm-02-03_vjywg3.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291582/milkbalm-02-04_mni6uy.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291582/milkbalm-02-05_mycjt1.jpg'],sizes:['XS','S','M','L','XL'],sizeDescs:['XS(1~2/75~85cm/~10kg)','S(2~3/85~95cm/11~13kg)','M(3~4/95~105cm/14~17kg)','L(4~5/105~115cm/17~20kg)','XL(6~7/115~125cm/20~25kg)'],colors:['藍','白'],isNew:true},
+  {id:22,name:'水手洋裝',brand:'Milkbalm',type:'洋裝',price:880,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779291582/milkbalm-05-01_b8o6xa.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291582/milkbalm-05-02_wictdq.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291583/milkbalm-05-03_vd1uhi.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291583/milkbalm-05-04_yz8wu8.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291583/milkbalm-05-05_zeplv4.jpg'],sizes:['XS','S','M','L','XL'],sizeDescs:['XS(1~2/75~85cm/~10kg)','S(2~3/85~95cm/11~13kg)','M(3~4/95~105cm/14~17kg)','L(4~5/105~115cm/17~20kg)','XL(6~7/115~125cm/20~25kg)'],colors:['藍','粉'],isNew:true},
+  {id:23,name:'方領格紋上衣',brand:'Milkbalm',type:'上衣',price:720,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779291584/milkbalm-07-01_didv8o.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291584/milkbalm-07-02_wjtxfb.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291584/milkbalm-07-03_dmu8j0.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291585/milkbalm-07-05_w4a2wf.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291585/milkbalm-07-06_udulc9.jpg'],sizes:['XS','S','M','L','XL'],sizeDescs:['XS(1~2/75~85cm/~10kg)','S(2~3/85~95cm/11~13kg)','M(3~4/95~105cm/14~17kg)','L(4~5/105~115cm/17~20kg)','XL(6~7/115~125cm/20~25kg)'],colors:['藍','紅'],isNew:true},
+  {id:24,name:'候鳥刺繡洋裝',brand:'Milkbalm',type:'洋裝',price:1020,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779291586/milkbalm-09-01_wvgjzq.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291586/milkbalm-09-02_r1hzcg.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291645/milkbalm-09-03_x4hadb.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291645/milkbalm-09-04_xcck3u.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291645/milkbalm-09-05_ku0top.jpg'],sizes:['XS','S','M','L','XL'],sizeDescs:['XS(1~2/75~85cm/~10kg)','S(2~3/85~95cm/11~13kg)','M(3~4/95~105cm/14~17kg)','L(4~5/105~115cm/17~20kg)','XL(6~7/115~125cm/20~25kg)'],colors:['圖片色'],isNew:true},
+  {id:25,name:'超Q草莓刺繡洋裝',brand:'Milkbalm',type:'洋裝',price:800,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779291645/milkbalm-11-01_va3eia.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291645/milkbalm-11-02_q6qwvs.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291646/milkbalm-11-03_am9q4g.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291646/milkbalm-11-04_vfbfk1.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291646/milkbalm-11-05_pu1pmt.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291646/milkbalm-11-06_bthocn.jpg'],sizes:['XS','S','M','L','XL'],sizeDescs:['XS(1~2/75~85cm/~10kg)','S(2~3/85~95cm/11~13kg)','M(3~4/95~105cm/14~17kg)','L(4~5/105~115cm/17~20kg)','XL(6~7/115~125cm/20~25kg)'],colors:['深藍','淺藍'],isNew:true},
+  {id:26,name:'刺繡小雛菊洋裝',brand:'Milkbalm',type:'洋裝',price:860,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779291673/milkbalm-13-01_dddrco.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291673/milkbalm-13-02_ouia8k.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291673/milkbalm-13-03_ltovha.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291673/milkbalm-13-04_kcguux.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291673/milkbalm-13-05_jcja6p.jpg'],sizes:['XS','S','M','L','XL'],sizeDescs:['XS(1~2/75~85cm/~10kg)','S(2~3/85~95cm/11~13kg)','M(3~4/95~105cm/14~17kg)','L(4~5/105~115cm/17~20kg)','XL(6~7/115~125cm/20~25kg)'],colors:['圖片色'],isNew:true},
+  {id:27,name:'小蝴蝶結背心裙',brand:'Milkbalm',type:'洋裝',price:720,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779291646/milkbalm-12-01_vs2nto.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291646/milkbalm-12-02_dseywx.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291646/milkbalm-12-03_wj9nfj.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291647/milkbalm-12-04_ngtpd5.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291653/milkbalm-12-05_aisz6i.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291673/milkbalm-12-06_bktbob.jpg'],sizes:['XS','S','M','L','XL'],sizeDescs:['XS(1~2/75~85cm/~10kg)','S(2~3/85~95cm/11~13kg)','M(3~4/95~105cm/14~17kg)','L(4~5/105~115cm/17~20kg)','XL(6~7/115~125cm/20~25kg)'],colors:['藍','白'],isNew:true},
+  {id:28,name:'交叉後背造型上衣',brand:'Milkbalm',type:'上衣',price:400,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779291673/milkbalm-15-01_mecqae.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291674/milkbalm-15-02_hkjpsm.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291674/milkbalm-15-03_abblsq.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291674/milkbalm-15-04_sqevle.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291674/milkbalm-16-01_kypl66.jpg'],sizes:['XS','S','M','L','XL'],sizeDescs:['XS(1~2/75~85cm/~10kg)','S(2~3/85~95cm/11~13kg)','M(3~4/95~105cm/14~17kg)','L(4~5/105~115cm/17~20kg)','XL(6~7/115~125cm/20~25kg)'],colors:['粉','紅','白'],isNew:true},
+  {id:29,name:'小裙襬長褲',brand:'Milkbalm',type:'長褲',price:660,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779291674/milkbalm-16-01_kypl66.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291674/milkbalm-16-02_j5xvts.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291674/milkbalm-16-03_mffqyx.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291674/milkbalm-16-04_poweso.jpg'],sizes:['XS','S','M','L','XL'],sizeDescs:['XS(1~2/75~85cm/~10kg)','S(2~3/85~95cm/11~13kg)','M(3~4/95~105cm/14~17kg)','L(4~5/105~115cm/17~20kg)','XL(6~7/115~125cm/20~25kg)'],colors:['粉','黑','藍','紅'],isNew:true},
+  {id:30,name:'草莓髮夾',brand:'Milkbalm',type:'髮夾',price:250,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779291701/milkbalm-19-01_iisunj.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291701/milkbalm-19-02_xxewsn.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779291645/milkbalm-10-05_kwzqwq.jpg'],sizes:['Free'],sizeDescs:[],colors:['粉','紅'],isNew:false},
+  {id:31,name:'仙女飄飄上衣(大人)',brand:'Flo',type:'上衣',price:1080,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779466294/Flo-26s01-06_ddyrbv.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466294/Flo-26s01-05_adonl9.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466294/Flo-26s01-04_bg34vb.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466294/Flo-26s01-03_bnciqw.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466293/Flo-26s01-02_mwfg5n.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466293/Flo-26s01-01_hljxfx.jpg'],sizes:['Free'],sizeDescs:['成人尺寸'],colors:['紫','咖啡','白'],isNew:true},
+  {id:32,name:'仙女飄飄長裙(大人)',brand:'Flo',type:'裙子',price:2500,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779466254/Flo-26s02-06_ea76nx.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466253/Flo-26s02-05_uf4lao.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466253/Flo-26s02-04_vhpgvu.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466253/Flo-26s02-03_pdarf8.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466252/Flo-26s02-02_xjvmv1.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466252/Flo-26s02-01_mysjck.jpg'],sizes:['Free'],sizeDescs:['成人尺寸'],colors:['白'],isNew:true},
+  {id:33,name:'森林小精靈洋裝',brand:'Flo',type:'洋裝',price:980,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779466255/Flo-26s03-06_xn8ujr.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466255/Flo-26s03-05_bbgfqn.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466254/Flo-26s03-04_ow79pc.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466254/Flo-26s03-03_i1vy4x.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466254/Flo-26s03-02_cmfkhj.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466253/Flo-26s03-01_vnunws.jpg'],sizes:['90','100','110','120','130','140'],sizeDescs:['90(75~85cm/8~11kg)','100(85~95cm/11~14kg)','110(95~105cm/14~17kg)','120(105~115cm/17~20kg)','130(115~125cm/20~25kg)','140(125~135cm/25~30kg)'],colors:['綠','紅'],isNew:true},
+  {id:34,name:'層次小花上衣',brand:'Flo',type:'上衣',price:860,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779466252/Flo-26s04-05_cbbntb.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466255/Flo-26s04-04_ifpniq.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466256/Flo-26s04-03_j7gzch.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466255/Flo-26s04-02_qav8ql.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466255/Flo-26s04-01_gpfwzd.jpg'],sizes:['90','100','110','120','130','140'],sizeDescs:['90(75~85cm/8~11kg)','100(85~95cm/11~14kg)','110(95~105cm/14~17kg)','120(105~115cm/17~20kg)','130(115~125cm/20~25kg)','140(125~135cm/25~30kg)'],colors:['湖水綠','白'],isNew:true},
+  {id:35,name:'蕾絲層次短褲',brand:'Flo',type:'短褲',price:720,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779466255/Flo-26s06-01_sdyc04.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466254/Flo-26s05-06_hgdjun.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466253/Flo-26s05-04_mnbrtz.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466253/Flo-26s05-03_oyxbck.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466253/Flo-26s05-02_rxjqaw.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466252/Flo-26s05-01_jk8pue.jpg'],sizes:['90','100','110','120','130','140'],sizeDescs:['90(75~85cm/8~11kg)','100(85~95cm/11~14kg)','110(95~105cm/14~17kg)','120(105~115cm/17~20kg)','130(115~125cm/20~25kg)','140(125~135cm/25~30kg)'],colors:['藍','黃','紫'],isNew:true},
+  {id:36,name:'仙女飄飄上衣(小孩)',brand:'Flo',type:'上衣',price:680,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779466256/Flo-26s06-06_ly82lg.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466256/Flo-26s06-05_e0q2wm.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466255/Flo-26s06-04_c0fcr5.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466255/Flo-26s06-03_rbeotv.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466255/Flo-26s06-02_gazvab.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466255/Flo-26s06-01_sdyc04.jpg'],sizes:['90','100','110','120','130','140'],sizeDescs:['90(75~85cm/8~11kg)','100(85~95cm/11~14kg)','110(95~105cm/14~17kg)','120(105~115cm/17~20kg)','130(115~125cm/20~25kg)','140(125~135cm/25~30kg)'],colors:['紫','咖啡','白'],isNew:true},
+  {id:37,name:'夢幻小仙子褲裙',brand:'Flo',type:'褲裙',price:780,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779466257/Flo-26s07-06_gakvpx.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466257/Flo-26s07-05_o64zbr.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466257/Flo-26s07-04_eixgld.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466256/Flo-26s07-03_kjmxgd.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466256/Flo-26s07-02_hr8csk.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466256/Flo-26s07-01_tca0s8.jpg'],sizes:['90','100','110','120','130','140'],sizeDescs:['90(75~85cm/8~11kg)','100(85~95cm/11~14kg)','110(95~105cm/14~17kg)','120(105~115cm/17~20kg)','130(115~125cm/20~25kg)','140(125~135cm/25~30kg)'],colors:['粉','咖啡','白'],isNew:true},
+  {id:38,name:'壓紋精緻上衣',brand:'Flo',type:'上衣',price:720,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779466257/Flo-26s08-05_ve196r.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466257/Flo-26s08-06_homwwx.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466257/Flo-26s08-04_osqewr.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466257/Flo-26s08-03_zjc8sg.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466257/Flo-26s08-02_bkvtx8.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466257/Flo-26s08-01_zbe6pq.jpg'],sizes:['90','100','110','120','130','140'],sizeDescs:['90(75~85cm/8~11kg)','100(85~95cm/11~14kg)','110(95~105cm/14~17kg)','120(105~115cm/17~20kg)','130(115~125cm/20~25kg)','140(125~135cm/25~30kg)'],colors:['粉','咖啡','白'],isNew:true},
+  {id:39,name:'飄飄夢幻紗褲裙',brand:'Flo',type:'褲裙',price:660,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779466258/Flo-26s09-06_mvzewz.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466258/Flo-26s09-05_yiven6.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466258/Flo-26s09-04_jf3cdj.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466258/Flo-26s09-03_yc8p4x.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466258/Flo-26s09-02_aluds8.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466258/Flo-26s09-01_adm3wb.jpg'],sizes:['90','100','110','120','130','140'],sizeDescs:['90(75~85cm/8~11kg)','100(85~95cm/11~14kg)','110(95~105cm/14~17kg)','120(105~115cm/17~20kg)','130(115~125cm/20~25kg)','140(125~135cm/25~30kg)'],colors:['粉','藍','白'],isNew:true},
+  {id:40,name:'簍空雕花短褲',brand:'Flo',type:'短褲',price:800,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779466259/Flo-26s10-01_m8nqmx.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466259/Flo-26s10-02_tv3edq.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466259/Flo-26s10-03_foftrh.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466259/Flo-26s10-04_mamtsk.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466259/Flo-26s10-05_dhbmzk.jpg'],sizes:['90','100','110','120','130','140'],sizeDescs:['90(75~85cm/8~11kg)','100(85~95cm/11~14kg)','110(95~105cm/14~17kg)','120(105~115cm/17~20kg)','130(115~125cm/20~25kg)','140(125~135cm/25~30kg)'],colors:['粉','藍','白'],isNew:true},
+  {id:41,name:'簍空雕花上衣',brand:'Flo',type:'上衣',price:720,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779466292/Flo-26s11-06_kwzeiq.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466292/Flo-26s11-05_usrlzi.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466292/Flo-26s11-04_vjaazm.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466292/Flo-26s11-03_tr8ucq.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466259/Flo-26s11-02_yq5koz.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466259/Flo-26s11-01_rhai0b.jpg'],sizes:['90','100','110','120','130','140'],sizeDescs:['90(75~85cm/8~11kg)','100(85~95cm/11~14kg)','110(95~105cm/14~17kg)','120(105~115cm/17~20kg)','130(115~125cm/20~25kg)','140(125~135cm/25~30kg)'],colors:['粉','藍','白'],isNew:true},
+  {id:42,name:'簍空雕花層次短褲',brand:'Flo',type:'短褲',price:760,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779466292/Flo-26s12-01_bgdwwe.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466292/Flo-26s12-02_y9chir.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466293/Flo-26s12-03_sehkos.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466293/Flo-26s12-04_qeduld.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466293/Flo-26s12-05_ctwev8.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779466293/Flo-26s12-06_raabcv.jpg'],sizes:['90','100','110','120','130','140'],sizeDescs:['90(75~85cm/8~11kg)','100(85~95cm/11~14kg)','110(95~105cm/14~17kg)','120(105~115cm/17~20kg)','130(115~125cm/20~25kg)','140(125~135cm/25~30kg)'],colors:['粉','藍','白','咖啡'],isNew:true},
+  {id:43,name:'清爽無袖上衣',brand:'Aosta',type:'上衣',price:280,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779602173/Aosta-26s01-1_n2e9ee.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602173/Aosta-26s01-2_otabky.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602174/Aosta-26s01-3_zt0sju.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602222/Aosta-26s01-4_ate2gk.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602221/Aosta-26s01-5_lxwryd.jpg'],sizes:['S','M','L','XL','XXL'],sizeDescs:['S(70/0-1y/60-70cm/3-10kg)','M(80/1-2y/70-80cm/7-12kg)','L(90/2-3y/80-95cm/10-15kg)','XL(100/3-4y/90-105cm/12-18kg)','XXL(110/4-5y/100-115cm/15-24kg)'],colors:['小鴨','紅蘿蔔','黑','白'],isNew:true},
+  {id:44,name:'蝴蝶結捲捲邊長褲',brand:'Aosta',type:'長褲',price:380,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779602222/Aosta-26s02-1_lryfld.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602222/Aosta-26s02-2_homzu8.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602222/Aosta-26s02-3_ksffvn.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602222/Aosta-26s02-4_cgsaav.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602222/Aosta-26s02-5_zlf53c.jpg'],sizes:['S','M','L','XL','XXL'],sizeDescs:['S(70/0-1y/60-70cm/3-10kg)','M(80/1-2y/70-80cm/7-12kg)','L(90/2-3y/80-95cm/10-15kg)','XL(100/3-4y/90-105cm/12-18kg)','XXL(110/4-5y/100-115cm/15-24kg)'],colors:['小鴨','紅蘿蔔','黑','白'],isNew:true},
+  {id:45,name:'捲捲邊上衣',brand:'Aosta',type:'上衣',price:380,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779602222/Aosta-26s03-1_i2uedb.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602222/Aosta-26s03-2_ddwoqw.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602222/Aosta-26s03-3_hbmsvq.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602223/Aosta-26s03-4_qgqsiz.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602223/Aosta-26s03-5_m7f7gi.jpg'],sizes:['S','M','L','XL','XXL'],sizeDescs:['S(70/0-1y/60-70cm/3-10kg)','M(80/1-2y/70-80cm/7-12kg)','L(90/2-3y/80-95cm/10-15kg)','XL(100/3-4y/90-105cm/12-18kg)','XXL(110/4-5y/100-115cm/15-24kg)'],colors:['小鴨','紅蘿蔔','黑','白'],isNew:true},
+  {id:46,name:'包邊短褲',brand:'Aosta',type:'短褲',price:340,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779602223/Aosta-26s04-1_ckvqnc.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602223/Aosta-26s04-2_zmsaqc.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602223/Aosta-26s04-3_na2iun.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602223/Aosta-26s04-4_ujngf9.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602223/Aosta-26s04-5_s7kcfc.jpg'],sizes:['S','M','L','XL','XXL'],sizeDescs:['S(70/0-1y/60-70cm/3-10kg)','M(80/1-2y/70-80cm/7-12kg)','L(90/2-3y/80-95cm/10-15kg)','XL(100/3-4y/90-105cm/12-18kg)','XXL(110/4-5y/100-115cm/15-24kg)'],colors:['小鴨','紅蘿蔔','黑','白'],isNew:true},
+  {id:47,name:'蕾絲褲擺長褲',brand:'Aosta',type:'長褲',price:380,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779602223/Aosta-26s05-1_um9la0.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602223/Aosta-26s05-2_e20a09.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602239/Aosta-26s05-3_na7ztj.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602239/Aosta-26s05-4_vj22sc.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602167/Aosta-26s05-5_kmu84x.jpg'],sizes:['S','M','L','XL','XXL'],sizeDescs:['S(70/0-1y/60-70cm/3-10kg)','M(80/1-2y/70-80cm/7-12kg)','L(90/2-3y/80-95cm/10-15kg)','XL(100/3-4y/90-105cm/12-18kg)','XXL(110/4-5y/100-115cm/15-24kg)'],colors:['小花','白','米黃'],isNew:true},
+  {id:48,name:'捲捲邊典雅上衣',brand:'Aosta',type:'上衣',price:360,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779602167/Aosta-26s06-1_xmd3kr.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602167/Aosta-26s06-2_cgmzpc.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602168/Aosta-26s06-3_k3tgrd.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602168/Aosta-26s06-4_p2j1e9.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602168/Aosta-26s06-5_juo4sm.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602168/Aosta-26s06-6_kbipxq.jpg'],sizes:['S','M','L','XL','XXL'],sizeDescs:['S(70/0-1y/60-70cm/3-10kg)','M(80/1-2y/70-80cm/7-12kg)','L(90/2-3y/80-95cm/10-15kg)','XL(100/3-4y/90-105cm/12-18kg)','XXL(110/4-5y/100-115cm/15-24kg)'],colors:['小花','白','米黃'],isNew:true},
+  {id:49,name:'碎花上衣',brand:'Aosta',type:'上衣',price:420,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779602168/Aosta-26s07-1_oyymuz.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602169/Aosta-26s07-2_yl2kxp.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602169/Aosta-26s07-3_zitpfs.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602169/Aosta-26s07-4_bggo5f.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602169/Aosta-26s07-5_zlxdph.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602169/Aosta-26s07-6_ko9cg3.jpg'],sizes:['S','M','L','XL','XXL'],sizeDescs:['S(70/0-1y/60-70cm/3-10kg)','M(80/1-2y/70-80cm/7-12kg)','L(90/2-3y/80-95cm/10-15kg)','XL(100/3-4y/90-105cm/12-18kg)','XXL(110/4-5y/100-115cm/15-24kg)'],colors:['深藍','小藍花','小紅花'],isNew:true},
+  {id:50,name:'綁帶小露背上衣',brand:'Aosta',type:'上衣',price:620,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779602169/Aosta-26s08-1_silfdg.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602170/Aosta-26s08-2_ijujup.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602167/Aosta-26s08-3_it4wyz.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602167/Aosta-26s08-4_uctkoh.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602167/Aosta-26s08-5_nbtn7g.jpg'],sizes:['S','M','L','XL','XXL'],sizeDescs:['S(70/0-1y/60-70cm/3-10kg)','M(80/1-2y/70-80cm/7-12kg)','L(90/2-3y/80-95cm/10-15kg)','XL(100/3-4y/90-105cm/12-18kg)','XXL(110/4-5y/100-115cm/15-24kg)'],colors:['紅','粉','黃'],isNew:true},
+  {id:51,name:'小飛袖上衣',brand:'Aosta',type:'上衣',price:380,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779602168/Aosta-26s09-1_ujzlhw.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602168/Aosta-26s09-2_xdn5gt.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602169/Aosta-26s09-3_bxtjqd.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602169/Aosta-26s09-4_a1wj4y.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602169/Aosta-26s09-5_ymkgxp.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602169/Aosta-26s09-6_f9x8mr.jpg'],sizes:['S','M','L','XL','XXL'],sizeDescs:['S(70/0-1y/60-70cm/3-10kg)','M(80/1-2y/70-80cm/7-12kg)','L(90/2-3y/80-95cm/10-15kg)','XL(100/3-4y/90-105cm/12-18kg)','XXL(110/4-5y/100-115cm/15-24kg)'],colors:['深藍','棕','綠','米白'],isNew:true},
+  {id:52,name:'小挖背上衣',brand:'Aosta',type:'上衣',price:420,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779602169/Aosta-26s10-1_ktrvyr.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602170/Aosta-26s10-2_ezvacr.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602170/Aosta-26s10-3_tohpha.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602170/Aosta-26s10-4_qazu6x.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602170/Aosta-26s10-5_fqb8qq.jpg'],sizes:['S','M','L','XL','XXL'],sizeDescs:['S(70/0-1y/60-70cm/3-10kg)','M(80/1-2y/70-80cm/7-12kg)','L(90/2-3y/80-95cm/10-15kg)','XL(100/3-4y/90-105cm/12-18kg)','XXL(110/4-5y/100-115cm/15-24kg)'],colors:['深藍','白'],isNew:true},
+  {id:53,name:'多色喇叭褲',brand:'Aosta',type:'長褲',price:260,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779602170/Aosta-26s11-1_onx8lo.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602170/Aosta-26s11-2_qmpkyp.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602170/Aosta-26s11-3_rt3xyo.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602171/Aosta-26s11-4_mur3yg.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602171/Aosta-26s11-5_qaduzu.jpg'],sizes:['S','M','L','XL','XXL'],sizeDescs:['S(70/0-1y/60-70cm/3-10kg)','M(80/1-2y/70-80cm/7-12kg)','L(90/2-3y/80-95cm/10-15kg)','XL(100/3-4y/90-105cm/12-18kg)','XXL(110/4-5y/100-115cm/15-24kg)'],colors:['黑','白','小雞黃','粉'],isNew:true,desc:'每季自購，好穿又好搭配的喇叭褲'},
+  {id:54,name:'緹花上衣',brand:'Aosta',type:'上衣',price:620,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779602171/Aosta-26s12-1_mburae.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602171/Aosta-26s12-2_ucwslv.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602171/Aosta-26s12-3_c44r52.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602171/Aosta-26s12-4_reahmp.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602171/Aosta-26s12-5_etcf9u.jpg'],sizes:['S','M','L','XL','XXL'],sizeDescs:['S(70/0-1y/60-70cm/3-10kg)','M(80/1-2y/70-80cm/7-12kg)','L(90/2-3y/80-95cm/10-15kg)','XL(100/3-4y/90-105cm/12-18kg)','XXL(110/4-5y/100-115cm/15-24kg)'],colors:['白','米白'],isNew:true},
+  {id:55,name:'蝴蝶結後背上衣',brand:'Aosta',type:'上衣',price:400,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779602171/Aosta-26s13-1_ihn1pg.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602171/Aosta-26s13-2_nbhjzj.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602171/Aosta-26s13-3_jbhxfu.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602171/Aosta-26s13-4_hkkutc.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602172/Aosta-26s13-5_qqvets.jpg'],sizes:['S','M','L','XL','XXL'],sizeDescs:['S(70/0-1y/60-70cm/3-10kg)','M(80/1-2y/70-80cm/7-12kg)','L(90/2-3y/80-95cm/10-15kg)','XL(100/3-4y/90-105cm/12-18kg)','XXL(110/4-5y/100-115cm/15-24kg)'],colors:['愛心','黑底白點','白底黑點'],isNew:true},
+  {id:56,name:'小裙襬長褲',brand:'Aosta',type:'長褲',price:420,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1779602172/Aosta-26s14-1_yszaii.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602172/Aosta-26s14-2_jfqvur.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602172/Aosta-26s14-3_vntyvq.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602172/Aosta-26s14-4_zpjipo.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602172/Aosta-26s14-5_r4pwdh.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1779602172/Aosta-26s14-6_ttzval.jpg'],sizes:['S','M','L','XL','XXL'],sizeDescs:['S(70/0-1y/60-70cm/3-10kg)','M(80/1-2y/70-80cm/7-12kg)','L(90/2-3y/80-95cm/10-15kg)','XL(100/3-4y/90-105cm/12-18kg)','XXL(110/4-5y/100-115cm/15-24kg)'],colors:['愛心','黑底白點','白底黑點'],isNew:true},
+];
+
+function sp(p){return p.isNew?Math.round(p.price*DISC):p.price;}
+function calc(){
+  const sub=cart.reduce((a,c)=>a+sp(c)*c.qty,0);
+  const disc=cart.reduce((a,c)=>c.isNew?a+Math.round(c.price*c.qty-sp(c)*c.qty):a,0);
+  const ship=sub>=SFREE?0:SFEE;
+  return{sub,disc,ship,total:sub+ship};
+}
+
+function buildSidebar(){
+  const types=[...new Set(P.map(p=>p.type))].filter(Boolean);
+  const brands=[...new Set(P.map(p=>p.brand))].filter(Boolean);
+  document.getElementById('g-type').innerHTML=types.map(t=>`<div class="ci" onclick="sc('type:${t}',this)"><span class="ci-i">${typeIcons[t]||'▸'}</span><span class="ci-l">${t}</span></div>`).join('');
+  document.getElementById('g-brand').innerHTML=brands.map(b=>`<div class="ci" onclick="sc('brand:${b}',this)"><span class="ci-i" style="font-size:10px;font-weight:700;">${b.charAt(0)}</span><span class="ci-l">${b}</span></div>`).join('');
+}
+
+function tg(k){const gs=document.getElementById('g-'+k);const isOpen=gs.style.maxHeight!=='0px'&&gs.style.maxHeight!=='';gs.style.maxHeight=isOpen?'0':'400px';document.getElementById('a-'+k).classList.toggle('open',!isOpen);}
+function ca(){document.getElementById('aci').classList.remove('on');document.querySelectorAll('.ci').forEach(i=>i.classList.remove('on'));}
+function sc(c,el){cat=c;curPage=1;ca();if(c==='all')document.getElementById('aci').classList.add('on');else if(el)el.classList.add('on');document.getElementById('albl').textContent=c==='all'?'ALL ITEMS':c.split(':')[1];rg();gp('shop');}
+function gl(){return P.filter(p=>{if(cat==='all')return true;const[t,v]=cat.split(':');if(t==='type')return p.type===v;if(t==='brand')return p.brand===v;return true;});}
+
+function rg(){
+  const g=document.getElementById('grid'),l=gl();
+  if(!l.length){g.innerHTML='<div class="empty">此分類暫無商品</div>';document.getElementById('pagination').style.display='none';return;}
+  const totalPages=Math.ceil(l.length/PAGE_SIZE);
+  if(curPage>totalPages)curPage=1;
+  const items=l.slice((curPage-1)*PAGE_SIZE,curPage*PAGE_SIZE);
+  g.innerHTML=items.map(p=>`
+    <div class="card" onclick="od(${p.id})">
+      <div class="cimg">
+        ${p.isNew?'<span class="ntag">新品 95折</span>':''}
+        <img src="${p.imgs[0]}" loading="lazy" onerror="this.style.display='none'" />
+      </div>
+      <div class="cb">
+        <div class="cbr">${p.brand}</div>
+        <div class="cnm">${p.name}</div>
+        <div class="cpr">
+          <span class="cpr-n">NT$ ${sp(p)}</span>
+          ${p.isNew?`<span class="cpr-o">NT$ ${p.price}</span>`:''}
+        </div>
+      </div>
+    </div>`).join('');
+  const pgEl=document.getElementById('pagination');
+  if(totalPages>1){pgEl.style.display='flex';document.getElementById('pg-prev').disabled=curPage===1;document.getElementById('pg-next').disabled=curPage===totalPages;document.getElementById('pg-info').textContent=`第${curPage}頁/共${totalPages}頁`;}
+  else pgEl.style.display='none';
+}
+
+function changePage(d){curPage+=d;rg();window.scrollTo(0,0);}
+
+function od(id){
+  cur=P.find(x=>x.id===id);sz=null;cl=null;curImgs=cur.imgs||[];curImgIdx=0;
+  document.getElementById('dbr').textContent=cur.brand;
+  document.getElementById('dnm').textContent=cur.name;
+  document.getElementById('dag').textContent='';
+  document.getElementById('dpr').innerHTML=`<span class="dpr-n">NT$ ${sp(cur)}</span>${cur.isNew?`<span class="dpr-o">NT$ ${cur.price}</span><span class="dpr-tag">新品 95折</span>`:''}`;
+  document.getElementById('dszs').innerHTML=cur.sizes.map(s=>`<span class="sz" onclick="ps('${s}',this)">${s}</span>`).join('');
+  const sd=document.getElementById('sz-desc');
+  sd.innerHTML=cur.sizeDescs&&cur.sizeDescs.length?cur.sizeDescs.join('<br>'):'';
+  sd.style.display=cur.sizeDescs&&cur.sizeDescs.length?'block':'none';
+  const clbl=document.getElementById('clbl');
+  const clsEl=document.getElementById('dcls');
+  if(cur.colors&&cur.colors.length){clbl.style.display='block';clsEl.innerHTML=cur.colors.map(c=>`<span class="cl" onclick="pc('${c}',this)">${c}</span>`).join('');}
+  else{clbl.style.display='none';clsEl.innerHTML='';}
+  renderDim();gp('detail');
+}
+
+function renderDim(){
+  const d=document.getElementById('dim');
+  const src=curImgs[curImgIdx]||'';
+  d.innerHTML=(src?`<img src="${src}" style="width:100%;height:100%;object-fit:cover;" />`:'<span style="font-size:48px;opacity:0.2;">👗</span>')+
+    (cur.isNew?'<div class="dnb">新品上市</div>':'')+
+    (curImgs.length>1?`<button class="img-nav prev" onclick="chImg(-1)">‹</button><button class="img-nav next" onclick="chImg(1)">›</button><div class="img-dots">${curImgs.map((_,i)=>`<button class="img-dot ${i===curImgIdx?'on':''}" onclick="goImg(${i})"></button>`).join('')}</div>`:'');
+}
+function chImg(d){curImgIdx=(curImgIdx+d+curImgs.length)%curImgs.length;renderDim();}
+function goImg(i){curImgIdx=i;renderDim();}
+function ps(s,el){sz=s;document.querySelectorAll('#dszs .sz').forEach(x=>x.classList.remove('on'));el.classList.add('on');}
+function pc(c,el){cl=c;document.querySelectorAll('#dcls .cl').forEach(x=>x.classList.remove('on'));el.classList.add('on');}
+
+function addCart(){
+  if(!sz){alert('請先選擇尺寸');return;}
+  if(cur.colors&&cur.colors.length>0&&!cl){alert('請先選擇顏色');return;}
+  const key=cur.id+'_'+sz+'_'+(cl||'');
+  const ex=cart.find(c=>c.key===key);
+  if(ex)ex.qty++;else cart.push({...cur,size:sz,color:cl||'',key,qty:1});
+  document.getElementById('cnt').textContent=cart.reduce((a,c)=>a+c.qty,0);
+  gp('cart');
+}
+
+function rc(){
+  const el=document.getElementById('citems'),ft=document.getElementById('cfoot'),em=document.getElementById('cempty');
+  if(!cart.length){el.innerHTML='';ft.style.display='none';em.style.display='block';return;}
+  em.style.display='none';ft.style.display='block';
+  const{sub,disc,ship,total}=calc();
+  document.getElementById('sind').innerHTML=sub>=SFREE?`<div class="ship-ok">🚚 已達免運門檻！</div>`:`<div class="ship-no"><span>再買 <b style="color:var(--pk3);">NT$${SFREE-sub}</b> 免運</span><div class="spbar"><div class="spfill" style="width:${Math.min(100,Math.round(sub/SFREE*100))}%;"></div></div>🚚</div>`;
+  document.getElementById('csum').innerHTML=cart.map(c=>`<div class="crow"><span>${c.name}(${c.size}${c.color?'/'+c.color:''})×${c.qty}</span><span style="color:var(--pk3);">NT$${(sp(c)*c.qty).toLocaleString()}</span></div>`).join('')+`<div class="cdiv"></div><div class="csub"><span style="color:var(--tx3);">小計</span><span>NT$${sub.toLocaleString()}</span></div>`+(disc?`<div class="csub"><span style="color:var(--gn);">🏷新品95折</span><span style="color:var(--gn);">－NT$${disc.toLocaleString()}</span></div>`:'')+`<div class="csub"><span style="color:var(--tx3);">運費</span><span style="color:${ship===0?'var(--gn)':'var(--tx3)'};">${ship===0?'🎉免運':'NT$'+ship}</span></div><div class="ctot"><span>總金額</span><span class="ctot-a">NT$${total.toLocaleString()}</span></div>`;
+  el.innerHTML=cart.map((c,i)=>`<div class="citem"><div class="ci-img"><img src="${c.imgs[0]}" style="width:100%;height:100%;object-fit:cover;" /></div><div style="flex:1;"><div style="font-size:12px;font-weight:600;color:var(--br2);margin-bottom:2px;">${c.name}</div><div style="font-size:10px;color:var(--tx3);margin-bottom:4px;">${c.brand}・${c.size}${c.color?'・'+c.color:''}・x${c.qty}</div><div style="font-size:13px;font-weight:600;color:var(--pk3);">NT$${(sp(c)*c.qty).toLocaleString()}</div></div><button style="background:none;border:none;color:var(--tx3);cursor:pointer;font-size:16px;" onclick="di(${i})">✕</button></div>`).join('');
+}
+function di(i){cart.splice(i,1);document.getElementById('cnt').textContent=cart.reduce((a,c)=>a+c.qty,0);rc();}
+
+function sumHTML(){
+  const{sub,disc,ship,total}=calc();
+  return`<div class="ost">訂單明細</div>`+cart.map(c=>`<div class="osr"><span style="color:var(--tx2);">${c.name}(${c.size}${c.color?'/'+c.color:''})×${c.qty}${c.isNew?' 🏷95折':''}</span><span class="osa">NT$${(sp(c)*c.qty).toLocaleString()}</span></div>`).join('')+(disc?`<div class="osr"><span style="color:var(--gn);">折扣</span><span style="color:var(--gn);">－NT$${disc.toLocaleString()}</span></div>`:'')+`<div class="osr"><span style="color:var(--tx3);">運費</span><span style="color:${ship===0?'var(--gn)':'var(--tx3)'};">${ship===0?'免運':'NT$'+ship}</span></div><div class="osr"><span>應付金額</span><span class="osa">NT$${total.toLocaleString()}</span></div>`;
+}
+
+function gp(p){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('pg-'+p).classList.add('active');window.scrollTo(0,0);if(p==='cart')rc();if(p==='confirm')document.getElementById('cfsum').innerHTML=sumHTML();if(p==='form')document.getElementById('fsum').innerHTML=sumHTML();}
+
+async function submitOrder(){
+  const name=document.getElementById('fn').value.trim();
+  const ig=document.getElementById('fig').value.trim();
+  const phone=document.getElementById('fp').value.trim();
+  const store=document.getElementById('fs').value.trim();
+  if(!name||!phone||!store){alert('請填寫姓名、手機、取貨門市');return;}
+  const{total}=calc();
+  const itemsStr=cart.map(c=>`${c.name}(${c.size}${c.color?'/'+c.color:''})×${c.qty}`).join('、');
+  const btn=document.getElementById('submit-btn');
+  btn.textContent='送出中...';btn.disabled=true;
+  try{
+    const res=await fetch(API,{method:'POST',body:JSON.stringify({action:'addOrder',name,ig,phone,store,items:itemsStr,total})});
+    const data=await res.json();
+    if(data.success){document.getElementById('sno').textContent='訂單編號 '+data.orderNo;cart=[];document.getElementById('cnt').textContent=0;['fn','fig','fp','fs'].forEach(id=>document.getElementById(id).value='');gp('ok');}
+    else alert('送出失敗，請再試一次');
+  }catch(e){alert('網路錯誤，請再試一次');}
+  btn.textContent='確認下單 →';btn.disabled=false;
+}
+
+// 頁面載入完成後立即執行
+buildSidebar();
+rg();
+</script>
+</body>
+</html>

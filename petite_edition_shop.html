@@ -227,6 +227,14 @@ body{background:var(--cr);color:var(--tx);font-family:-apple-system,BlinkMacSyst
       </div>
       <div id="disc-msg" style="font-size:11px;margin-top:6px;"></div>
     </div>
+    <div class="fg">
+      <label class="fl">親子裝優惠碼 <span class="opt-lbl">（選填）</span></label>
+      <div style="display:flex;gap:8px;">
+        <input id="ffam" placeholder="輸入折扣碼" style="flex:1;"/>
+        <button type="button" onclick="applyFamilyCode()" style="border:1px solid var(--bd2);border-radius:8px;padding:0 16px;font-size:12px;background:transparent;color:var(--tx2);cursor:pointer;white-space:nowrap;">套用</button>
+      </div>
+      <div id="fam-msg" style="font-size:11px;margin-top:6px;"></div>
+    </div>
     <div class="osum" id="fsum"></div>
     <button class="btnm" id="submit-btn" onclick="submitOrder()">確認下單 →</button>
   </div>
@@ -247,7 +255,8 @@ body{background:var(--cr);color:var(--tx);font-family:-apple-system,BlinkMacSyst
 const API='https://script.google.com/macros/s/AKfycbw-pBa_V9LY7OP1O9iDS371QOqJsN_DsGuk4cI1RZEYpG7YNS_k0OyAY5XUXq_5JTKx/exec';
 const DISC=0.95,SFREE=1800,SFEE=60,PAGE_SIZE=8;
 const DISC_CODES=['AUTUMN01','AUTUMN02','AUTUMN03','AUTUMN04','AUTUMN05','AUTUMN06','AUTUMN07','AUTUMN08','AUTUMN09','AUTUMN10'];
-let curPage=1,prods=[],cat='all',cur=null,sz=null,cl=null,cart=[],curImgs=[],curImgIdx=0,appliedCode=null;
+const FAMILY_CODE='MOMOFAMILY60',FAMILY_DISC=60;
+let curPage=1,prods=[],cat='all',cur=null,sz=null,cl=null,cart=[],curImgs=[],curImgIdx=0,appliedCode=null,familyApplied=false;
 
 const P=[
   {id:0,name:'基本款風衣外套',brand:'The lala',type:'外套',price:880,imgs:['https://res.cloudinary.com/drdstfnvf/image/upload/v1786630976/lala01-1_ezxtff.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1786630977/lala01-2_q2zgi3.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1786630977/lala01-3_khdurl.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1786630977/lala01-4_jesslo.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1786630976/lala01-1-5_jzupzv.jpg','https://res.cloudinary.com/drdstfnvf/image/upload/v1786630976/lala01-1-6_isu40d.jpg'],sizes:['XS','S','M','L','XL'],sizeDescs:['XS (~75cm)','S (75~85cm)','M (85~95cm)','L(95~105cm)','XL(105~115cm)'],colors:['奶油白','灰'],isNew:true},
@@ -353,11 +362,17 @@ const P=[
 ];
 
 function sp(p){return p.isNew?Math.round(p.price*DISC):p.price;}
+function momoFamilyEligible(){
+  const hasAdult=cart.some(c=>c.brand==='MOMOANN'&&(c.size||'').toLowerCase()==='free');
+  const hasChild=cart.some(c=>c.brand==='MOMOANN'&&(c.size||'').toLowerCase()!=='free');
+  return hasAdult&&hasChild;
+}
 function calc(){
   const sub=cart.reduce((a,c)=>a+sp(c)*c.qty,0);
   const disc=cart.reduce((a,c)=>c.isNew?a+Math.round(c.price*c.qty-sp(c)*c.qty):a,0);
+  const familyDisc=(familyApplied&&momoFamilyEligible())?FAMILY_DISC:0;
   const ship=(appliedCode||sub>=SFREE)?0:SFEE;
-  return{sub,disc,ship,total:sub+ship};
+  return{sub,disc,familyDisc,ship,total:Math.max(0,sub+ship-familyDisc)};
 }
 function usedCodes(){try{return JSON.parse(localStorage.getItem('usedDiscCodes')||'[]');}catch(e){return[];}}
 function markCodeUsed(code){const u=usedCodes();if(!u.includes(code)){u.push(code);localStorage.setItem('usedDiscCodes',JSON.stringify(u));}}
@@ -368,6 +383,15 @@ function applyDiscountCode(){
   if(!DISC_CODES.includes(code)){appliedCode=null;msg.textContent='❌ 折扣碼無效';msg.style.color='var(--tx3)';}
   else if(usedCodes().includes(code)){appliedCode=null;msg.textContent='⚠️ 此折扣碼已使用過';msg.style.color='var(--tx3)';}
   else{appliedCode=code;msg.textContent='✅ 折扣碼套用成功，本次訂單免運！';msg.style.color='var(--gn)';}
+  document.getElementById('fsum').innerHTML=sumHTML();
+}
+function applyFamilyCode(){
+  const input=document.getElementById('ffam'),msg=document.getElementById('fam-msg');
+  const code=input.value.trim().toUpperCase();
+  if(!code){familyApplied=false;msg.textContent='';document.getElementById('fsum').innerHTML=sumHTML();return;}
+  if(code!==FAMILY_CODE){familyApplied=false;msg.textContent='❌ 折扣碼無效';msg.style.color='var(--tx3)';}
+  else if(!momoFamilyEligible()){familyApplied=false;msg.textContent='⚠️ 此優惠僅限同筆訂單同時購買 MomoAnn 大人＋小孩款式';msg.style.color='var(--tx3)';}
+  else{familyApplied=true;msg.textContent='✅ 折扣碼套用成功，折抵 NT$'+FAMILY_DISC;msg.style.color='var(--gn)';}
   document.getElementById('fsum').innerHTML=sumHTML();
 }
 
@@ -486,8 +510,8 @@ function rc(){
 function di(i){cart.splice(i,1);document.getElementById('cnt').textContent=cart.reduce((a,c)=>a+c.qty,0);rc();}
 
 function sumHTML(){
-  const{sub,disc,ship,total}=calc();
-  return`<div class="ost">訂單明細</div>`+cart.map(c=>`<div class="osr"><span style="color:var(--tx2);">${c.name}(${c.size}${c.color?'/'+c.color:''})×${c.qty}${c.isNew?' 🏷95折':''}</span><span class="osa">NT$${(sp(c)*c.qty).toLocaleString()}</span></div>`).join('')+(disc?`<div class="osr"><span style="color:var(--gn);">折扣</span><span style="color:var(--gn);">－NT$${disc.toLocaleString()}</span></div>`:'')+`<div class="osr"><span style="color:var(--tx3);">運費</span><span style="color:${ship===0?'var(--gn)':'var(--tx3)'};">${ship===0?'免運':'NT$'+ship}</span></div><div class="osr"><span>應付金額</span><span class="osa">NT$${total.toLocaleString()}</span></div>`;
+  const{sub,disc,familyDisc,ship,total}=calc();
+  return`<div class="ost">訂單明細</div>`+cart.map(c=>`<div class="osr"><span style="color:var(--tx2);">${c.name}(${c.size}${c.color?'/'+c.color:''})×${c.qty}${c.isNew?' 🏷95折':''}</span><span class="osa">NT$${(sp(c)*c.qty).toLocaleString()}</span></div>`).join('')+(disc?`<div class="osr"><span style="color:var(--gn);">折扣</span><span style="color:var(--gn);">－NT$${disc.toLocaleString()}</span></div>`:'')+(familyDisc?`<div class="osr"><span style="color:var(--gn);">親子裝優惠</span><span style="color:var(--gn);">－NT$${familyDisc.toLocaleString()}</span></div>`:'')+`<div class="osr"><span style="color:var(--tx3);">運費</span><span style="color:${ship===0?'var(--gn)':'var(--tx3)'};">${ship===0?'免運':'NT$'+ship}</span></div><div class="osr"><span>應付金額</span><span class="osa">NT$${total.toLocaleString()}</span></div>`;
 }
 
 function gp(p){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('pg-'+p).classList.add('active');window.scrollTo(0,0);if(p==='cart')rc();if(p==='confirm')document.getElementById('cfsum').innerHTML=sumHTML();if(p==='form')document.getElementById('fsum').innerHTML=sumHTML();}
@@ -498,20 +522,22 @@ async function submitOrder(){
   const phone=document.getElementById('fp').value.trim();
   const store=document.getElementById('fs').value.trim();
   if(!name||!ig||!phone||!store){alert('請填寫姓名、IG帳號、手機、取貨門市');return;}
-  const{total}=calc();
+  const{total,familyDisc}=calc();
   const itemsStr=cart.map(c=>`${c.name}(${c.size}${c.color?'/'+c.color:''})×${c.qty}`).join('、');
   const discountCode=appliedCode||'';
+  const familyCode=familyDisc?FAMILY_CODE:'';
   const btn=document.getElementById('submit-btn');
   btn.textContent='送出中...';btn.disabled=true;
   try{
-    const res=await fetch(API,{method:'POST',body:JSON.stringify({action:'addOrder',name,ig,phone,store,items:itemsStr,total,discountCode})});
+    const res=await fetch(API,{method:'POST',body:JSON.stringify({action:'addOrder',name,ig,phone,store,items:itemsStr,total,discountCode,familyCode,familyDisc})});
     const data=await res.json();
     if(data.success){
       if(appliedCode)markCodeUsed(appliedCode);
-      appliedCode=null;
+      appliedCode=null;familyApplied=false;
       document.getElementById('sno').textContent='訂單編號 '+data.orderNo;cart=[];document.getElementById('cnt').textContent=0;
-      ['fn','fig','fp','fs','fdisc'].forEach(id=>document.getElementById(id).value='');
+      ['fn','fig','fp','fs','fdisc','ffam'].forEach(id=>document.getElementById(id).value='');
       document.getElementById('disc-msg').textContent='';
+      document.getElementById('fam-msg').textContent='';
       gp('ok');
     }
     else alert('送出失敗，請再試一次');

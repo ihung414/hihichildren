@@ -457,4 +457,109 @@ function rg(){
       ){
         pgHTML+=`<button class="pg-btn ${i===curPage?'pg-active':''}" onclick="goPage(${i})">${i}</button>`;
       } else if(i===2 && curPage>4){
-        pgHTML+=`<span style="color:var(--tx3);padding:0 2px;">...</span>
+        pgHTML+=`<span style="color:var(--tx3);padding:0 2px;">...</span>`;
+      } else if(i===totalPages-1 && curPage<totalPages-3){
+        pgHTML+=`<span style="color:var(--tx3);padding:0 2px;">...</span>`;
+      }
+    }
+    pgEl.innerHTML=pgHTML;
+  } else {
+    pgEl.style.display='none';
+  }
+}
+
+function changePage(d){curPage+=d;rg();window.scrollTo(0,0);}
+function goPage(n){curPage=n;rg();window.scrollTo(0,0);}
+
+function od(id){
+  cur=P.find(x=>x.id===id);sz=null;cl=null;curImgs=cur.imgs||[];curImgIdx=0;
+  document.getElementById('dbr').textContent=cur.brand;
+  document.getElementById('dnm').textContent=cur.name;
+  document.getElementById('dag').textContent='';
+  document.getElementById('dpr').innerHTML=`<span class="dpr-n">NT$ ${sp(cur)}</span>${cur.isNew?`<span class="dpr-o">NT$ ${cur.price}</span><span class="dpr-tag">新品 95折</span>`:''}`;
+  document.getElementById('dszs').innerHTML=cur.sizes.map(s=>`<span class="sz" onclick="ps('${s}',this)">${s}</span>`).join('');
+  const sd=document.getElementById('sz-desc');
+  sd.innerHTML=cur.sizeDescs&&cur.sizeDescs.length?cur.sizeDescs.join('<br>'):'';
+  sd.style.display=cur.sizeDescs&&cur.sizeDescs.length?'block':'none';
+  const clbl=document.getElementById('clbl');
+  const clsEl=document.getElementById('dcls');
+  if(cur.colors&&cur.colors.length){clbl.style.display='block';clsEl.innerHTML=cur.colors.map(c=>`<span class="cl" onclick="pc('${c}',this)">${c}</span>`).join('');}
+  else{clbl.style.display='none';clsEl.innerHTML='';}
+  renderDim();gp('detail');
+}
+
+function renderDim(){
+  const d=document.getElementById('dim');
+  const src=curImgs[curImgIdx]||'';
+  d.innerHTML=(src?`<img src="${src}" style="width:100%;height:100%;object-fit:cover;" />`:'<span style="font-size:48px;opacity:0.2;">👗</span>')+
+    (cur.isNew?'<div class="dnb">新品上市</div>':'')+
+    (curImgs.length>1?`<button class="img-nav prev" onclick="chImg(-1)">‹</button><button class="img-nav next" onclick="chImg(1)">›</button><div class="img-dots">${curImgs.map((_,i)=>`<button class="img-dot ${i===curImgIdx?'on':''}" onclick="goImg(${i})"></button>`).join('')}</div>`:'');
+}
+function chImg(d){curImgIdx=(curImgIdx+d+curImgs.length)%curImgs.length;renderDim();}
+function goImg(i){curImgIdx=i;renderDim();}
+function ps(s,el){sz=s;document.querySelectorAll('#dszs .sz').forEach(x=>x.classList.remove('on'));el.classList.add('on');}
+function pc(c,el){cl=c;document.querySelectorAll('#dcls .cl').forEach(x=>x.classList.remove('on'));el.classList.add('on');}
+
+function addCart(){
+  if(!sz){alert('請先選擇尺寸');return;}
+  if(cur.colors&&cur.colors.length>0&&!cl){alert('請先選擇顏色');return;}
+  const key=cur.id+'_'+sz+'_'+(cl||'');
+  const ex=cart.find(c=>c.key===key);
+  if(ex)ex.qty++;else cart.push({...cur,size:sz,color:cl||'',key,qty:1});
+  document.getElementById('cnt').textContent=cart.reduce((a,c)=>a+c.qty,0);
+  gp('cart');
+}
+
+function rc(){
+  const el=document.getElementById('citems'),ft=document.getElementById('cfoot'),em=document.getElementById('cempty');
+  if(!cart.length){el.innerHTML='';ft.style.display='none';em.style.display='block';return;}
+  em.style.display='none';ft.style.display='block';
+  const{sub,disc,ship,total}=calc();
+  document.getElementById('sind').innerHTML=sub>=SFREE?`<div class="ship-ok">🚚 已達免運門檻！</div>`:`<div class="ship-no"><span>再買 <b style="color:var(--pk3);">NT$${SFREE-sub}</b> 免運</span><div class="spbar"><div class="spfill" style="width:${Math.min(100,Math.round(sub/SFREE*100))}%;"></div></div>🚚</div>`;
+  document.getElementById('csum').innerHTML=cart.map(c=>`<div class="crow"><span>${c.name}(${c.size}${c.color?'/'+c.color:''})×${c.qty}</span><span style="color:var(--pk3);">NT$${(sp(c)*c.qty).toLocaleString()}</span></div>`).join('')+`<div class="cdiv"></div><div class="csub"><span style="color:var(--tx3);">小計</span><span>NT$${sub.toLocaleString()}</span></div>`+(disc?`<div class="csub"><span style="color:var(--gn);">🏷新品95折</span><span style="color:var(--gn);">－NT$${disc.toLocaleString()}</span></div>`:'')+`<div class="csub"><span style="color:var(--tx3);">運費</span><span style="color:${ship===0?'var(--gn)':'var(--tx3)'};">${ship===0?'🎉免運':'NT$'+ship}</span></div><div class="ctot"><span>總金額</span><span class="ctot-a">NT$${total.toLocaleString()}</span></div>`;
+  el.innerHTML=cart.map((c,i)=>`<div class="citem"><div class="ci-img"><img src="${c.imgs[0]}" style="width:100%;height:100%;object-fit:cover;" /></div><div style="flex:1;"><div style="font-size:12px;font-weight:600;color:var(--br2);margin-bottom:2px;">${c.name}</div><div style="font-size:10px;color:var(--tx3);margin-bottom:4px;">${c.brand}・${c.size}${c.color?'・'+c.color:''}・x${c.qty}</div><div style="font-size:13px;font-weight:600;color:var(--pk3);">NT$${(sp(c)*c.qty).toLocaleString()}</div></div><button style="background:none;border:none;color:var(--tx3);cursor:pointer;font-size:16px;" onclick="di(${i})">✕</button></div>`).join('');
+}
+function di(i){cart.splice(i,1);document.getElementById('cnt').textContent=cart.reduce((a,c)=>a+c.qty,0);rc();}
+
+function sumHTML(){
+  const{sub,disc,familyDisc,ship,total}=calc();
+  return`<div class="ost">訂單明細</div>`+cart.map(c=>`<div class="osr"><span style="color:var(--tx2);">${c.name}(${c.size}${c.color?'/'+c.color:''})×${c.qty}${c.isNew?' 🏷95折':''}</span><span class="osa">NT$${(sp(c)*c.qty).toLocaleString()}</span></div>`).join('')+(disc?`<div class="osr"><span style="color:var(--gn);">折扣</span><span style="color:var(--gn);">－NT$${disc.toLocaleString()}</span></div>`:'')+(familyDisc?`<div class="osr"><span style="color:var(--gn);">親子裝優惠</span><span style="color:var(--gn);">－NT$${familyDisc.toLocaleString()}</span></div>`:'')+`<div class="osr"><span style="color:var(--tx3);">運費</span><span style="color:${ship===0?'var(--gn)':'var(--tx3)'};">${ship===0?'免運':'NT$'+ship}</span></div><div class="osr"><span>應付金額</span><span class="osa">NT$${total.toLocaleString()}</span></div>`;
+}
+
+function gp(p){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('pg-'+p).classList.add('active');window.scrollTo(0,0);if(p==='cart')rc();if(p==='confirm')document.getElementById('cfsum').innerHTML=sumHTML();if(p==='form')document.getElementById('fsum').innerHTML=sumHTML();}
+
+async function submitOrder(){
+  const name=document.getElementById('fn').value.trim();
+  const ig=document.getElementById('fig').value.trim();
+  const phone=document.getElementById('fp').value.trim();
+  const store=document.getElementById('fs').value.trim();
+  if(!name||!ig||!phone||!store){alert('請填寫姓名、IG帳號、手機、取貨門市');return;}
+  const{total,familyDisc}=calc();
+  const itemsStr=cart.map(c=>`${c.name}(${c.size}${c.color?'/'+c.color:''})×${c.qty}`).join('、');
+  const discountCode=appliedCode||'';
+  const familyCode=familyDisc?(familyEntry?familyEntry.code:''):'';
+  const btn=document.getElementById('submit-btn');
+  btn.textContent='送出中...';btn.disabled=true;
+  try{
+    const res=await fetch(API,{method:'POST',body:JSON.stringify({action:'addOrder',name,ig,phone,store,items:itemsStr,total,discountCode,familyCode,familyDisc})});
+    const data=await res.json();
+    if(data.success){
+      if(appliedCode)markCodeUsed(appliedCode);
+      appliedCode=null;familyApplied=false;familyEntry=null;
+      document.getElementById('sno').textContent='訂單編號 '+data.orderNo;cart=[];document.getElementById('cnt').textContent=0;
+      ['fn','fig','fp','fs','fdisc','ffam'].forEach(id=>document.getElementById(id).value='');
+      document.getElementById('disc-msg').textContent='';
+      document.getElementById('fam-msg').textContent='';
+      gp('ok');
+    }
+    else alert('送出失敗，請再試一次');
+  }catch(e){alert('網路錯誤，請再試一次');}
+  btn.textContent='確認下單 →';btn.disabled=false;
+}
+
+// 頁面載入完成後立即執行
+buildSidebar();
+rg();
+</script>
+</body>
+</html>

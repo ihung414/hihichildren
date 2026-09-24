@@ -394,7 +394,7 @@ const PRODUCTS_MAP={
 function parseOrderItems(itemsStr){
   // 解析商品明細字串 例：碎花泳裝兩件式(S/粉)×1、泳帽(Free)×2
   return itemsStr.split('、').map(item=>{
-    const m=item.match(/^(.+?)\((.+?)\)×(\d+)/);
+    const m=item.trim().match(/^(.+)\(([^()]*)\)×(\d+)\s*$/); // 取最後一組括號為規格，商品名可含括號
     if(!m) return {name:item,detail:'',qty:1};
     return {name:m[1].trim(),detail:m[2],qty:Number(m[3])};
   });
@@ -495,7 +495,7 @@ function renderSales(){
   orders.forEach(o=>{
     const items=String(o['商品明細']||'').split('、');
     items.forEach(item=>{
-      const m=item.match(/^(.+?)\(.*?\)×(\d+)/);
+      const m=item.trim().match(/^(.+)\([^()]*\)×(\d+)\s*$/);
       if(m){
         const name=m[1].trim(),qty=Number(m[2]);
         if(!itemMap[name])itemMap[name]={qty:0};

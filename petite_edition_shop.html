@@ -488,7 +488,7 @@ function changePage(d){curPage+=d;rg();window.scrollTo(0,0);}
 function goPage(n){curPage=n;rg();window.scrollTo(0,0);}
 
 function od(id){
-  cur=P.find(x=>x.id===id);sz=null;cl=null;curImgs=cur.imgs||[];curImgIdx=0;
+  cur=P.find(x=>x.id===id);sz=null;cl=null;curImgs=(cur.imgs||[]).filter(u=>!BAD_IMGS.has(u));curImgIdx=0;probeImgs(curImgs);
   document.getElementById('dbr').textContent=cur.brand;
   document.getElementById('dnm').textContent=cur.name;
   document.getElementById('dag').textContent='';
@@ -504,14 +504,25 @@ function od(id){
   renderDim();gp('detail');
 }
 
+// 照片不存在時自動略過（不顯示破圖、不算進切換圓點）
+const BAD_IMGS=new Set();
+function badImg(u){
+  if(BAD_IMGS.has(u))return;BAD_IMGS.add(u);
+  const i=curImgs.indexOf(u);if(i<0)return;
+  curImgs=curImgs.filter(x=>x!==u);
+  if(i<curImgIdx)curImgIdx--;
+  if(curImgIdx>=curImgs.length)curImgIdx=Math.max(0,curImgs.length-1);
+  renderDim();
+}
+function probeImgs(list){list.forEach(u=>{const im=new Image();im.onerror=()=>badImg(u);im.src=u;});}
 function renderDim(){
   const d=document.getElementById('dim');
   const src=curImgs[curImgIdx]||'';
-  d.innerHTML=(src?`<img src="${src}" style="width:100%;height:100%;object-fit:cover;" />`:'<span style="font-size:48px;opacity:0.2;">👗</span>')+
+  d.innerHTML=(src?`<img src="${src}" style="width:100%;height:100%;object-fit:cover;" onerror="badImg(this.src)" />`:'<span style="font-size:48px;opacity:0.2;">👗</span>')+
     (cur.isNew?'<div class="dnb">新品上市</div>':'')+
     (curImgs.length>1?`<button class="img-nav prev" onclick="chImg(-1)">‹</button><button class="img-nav next" onclick="chImg(1)">›</button><div class="img-dots">${curImgs.map((_,i)=>`<button class="img-dot ${i===curImgIdx?'on':''}" onclick="goImg(${i})"></button>`).join('')}</div>`:'');
 }
-function chImg(d){curImgIdx=(curImgIdx+d+curImgs.length)%curImgs.length;renderDim();}
+function chImg(d){if(!curImgs.length)return;curImgIdx=(curImgIdx+d+curImgs.length)%curImgs.length;renderDim();}
 function goImg(i){curImgIdx=i;renderDim();}
 function ps(s,el){sz=s;document.querySelectorAll('#dszs .sz').forEach(x=>x.classList.remove('on'));el.classList.add('on');}
 function pc(c,el){cl=c;document.querySelectorAll('#dcls .cl').forEach(x=>x.classList.remove('on'));el.classList.add('on');}
